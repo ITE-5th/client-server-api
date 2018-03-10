@@ -29,15 +29,19 @@ class ClientApi:
         self.tts.say(response['result'])
 
     def _build_message(self, type, question=None):
+        # type == "visual-question-answering"
+        # type == "face-recognition"
+        # type == "image-to-text"
+
         if question is None:
             return {
-                'type': type,
-                # 'img': self.cam.take_image(),
+                "type": type,
+                # "image": self.cam.take_image(),
             }
         return {
-            'type': 'vqa',
-            # 'img': self.cam.take_image(),
-            'question': question,
+            "type": "visual-question-answering",
+            # "image": self.cam.take_image(),
+            "question": question,
         }
 
 
