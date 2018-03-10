@@ -1,8 +1,9 @@
 import os
 import signal
 
-import snowboydecoder
 import speech_recognition as sr
+
+from client import snowboydecoder
 
 interrupted = False
 
@@ -10,8 +11,7 @@ interrupted = False
 class Recognizer:
     def __init__(self, pmdl_path=None, sensitivity=0.38, sphinx=True, google=True):
         if pmdl_path is None:
-            pmdl_path = ['/home/pi/Desktop/snowboy/examples/Python3/resources/models/snowboy.umdl']
-        # pmdlsbLoc = '/home/pi/Desktop/snowboy/swig/Python3/'
+            pmdl_path = ['./resources/models/snowboy.umdl']
 
         model = pmdl_path
         # capture SIGINT signal, e.g., Ctrl+C
@@ -57,6 +57,7 @@ class Recognizer:
         os.remove(fname)
 
     def detectedCallback(self):
+        snowboydecoder.play_audio_file(snowboydecoder.DETECT_DING)
         print('recording audio...', end='', flush=True)
 
     def signal_handler(self, signal, frame):

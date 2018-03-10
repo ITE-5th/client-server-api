@@ -7,7 +7,8 @@ import time
 import wave
 
 import pyaudio
-import snowboydetect
+
+from client import snowboydetect
 
 logging.basicConfig()
 logger = logging.getLogger("snowboy")
