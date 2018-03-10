@@ -1,7 +1,7 @@
 import os
 
 
-class Speaker:
+class TTS:
     def __init__(self, festival=True, espeak=True, pico=True):
         self.Festival = festival
         self.Espeak = espeak
@@ -22,4 +22,4 @@ class Speaker:
 
 
 if __name__ == '__main__':
-    Speaker(festival=True, espeak=True, pico=True).say('Hello World')
+    TTS(festival=True, espeak=True, pico=True).say('Hello World')

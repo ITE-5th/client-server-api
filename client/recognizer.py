@@ -1,6 +1,5 @@
 import os
 import signal
-
 import speech_recognition as sr
 
 from client import snowboydecoder
@@ -9,17 +8,17 @@ interrupted = False
 
 
 class Recognizer:
-    def __init__(self, pmdl_path=None, sensitivity=0.38, sphinx=True, google=True):
+    def __init__(self, pmdl_path=None, sensitivity=0.38, sphinx=True, google=True, server=None):
         if pmdl_path is None:
             pmdl_path = ['./resources/models/snowboy.umdl']
 
         model = pmdl_path
         # capture SIGINT signal, e.g., Ctrl+C
         signal.signal(signal.SIGINT, self.signal_handler)
-
         self.detector = snowboydecoder.HotwordDetector(model, sensitivity=sensitivity)
         self.sphinx = sphinx
         self.google = google
+        self.server = server
 
     def start(self):
         # main loop
@@ -32,6 +31,7 @@ class Recognizer:
         self.detector.terminate()
 
     def audioRecorderCallback(self, fname):
+
         print("converting audio to text")
         r = sr.Recognizer()
         with sr.AudioFile(fname) as source:

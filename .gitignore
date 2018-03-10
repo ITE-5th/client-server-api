@@ -99,8 +99,6 @@ ENV/
 
 # mypy
 .mypy_cache/
-.idea/inspectionProfiles/
 .idea/mclient-server-api.iml
-.idea/misc.xml
-.idea/modules.xml
-.idea/workspace.xml
+/client/voice.wav
+.idea/
