@@ -36,7 +36,7 @@ class Client:
             print("converting audio to text")
             speech = self.speech_to_text(fname)
             message = self._build_message('vqa', question=speech)
-            self.send(message)
+            self.communicate_with_server(message)
         else:
             print('speaker is not verified')
         os.remove(fname)
@@ -73,7 +73,7 @@ class Client:
     def close(self):
         self.socket.close()
 
-    def send(self, message):
+    def communicate_with_server(self, message):
         self.socket.send(message)
         response = self.socket.recv(4096)
         response = json.loads(response)

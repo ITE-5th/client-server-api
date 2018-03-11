@@ -1,10 +1,11 @@
 import json
+import os
 import socket
 # from face_recognition.face_recognition import FaceRecognition
 # from image_to_text.image_to_text import ImageToText
 # from vqa.vqa import Vqa
 import threading
-import os
+
 
 class Server:
     def __init__(self, host=socket.gethostname(), port=1234):
