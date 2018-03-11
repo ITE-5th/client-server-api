@@ -1,8 +1,12 @@
 import json
+import os
 import socket
+
+import speech_recognition as sr
 
 # from client.camera import Camera
 from client.TTS import TTS
+from client.recognizer import Recognizer
 
 
 class Client:
@@ -11,7 +15,7 @@ class Client:
         self.port = port
         # self.cam = Camera()
         self.tts = TTS(festival=False, espeak=False, pico=True)
-        # self.recognizer = Recognizer(server=self)
+        self.recognizer = Recognizer(server=self)
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -20,28 +24,46 @@ class Client:
         print('connected to server ' + self.host + ':' + str(self.port))
 
         self.socket.connect((self.host, self.port))
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.send()
-        self.close()
         #     start recogniser
-        # self.recognizer.start()
+        self.recognizer.start(self.audio_recorder_callback)
+
+    def audio_recorder_callback(self, fname):
+        # verify speaker
+
+        print("converting audio to text")
+        speech = self.speechToText(fname)
+        print(speech)
+        message = self._build_message('vqa', question=speech)
+
+        self.send(message)
+        os.remove(fname)
+
+    def speechToText(self, fname):
+        r = sr.Recognizer()
+        with sr.AudioFile(fname) as source:
+            audio = r.record(source)  # read the entire audio file
+        # recognize speech using Google Speech Recognition
+        try:
+            print("Sphinx thinks you said " + r.recognize_sphinx(audio))
+
+        except sr.UnknownValueError:
+            print("Sphinx could not understand audio")
+
+        except sr.RequestError as e:
+            print("Sphinx error; {0}".format(e))
+        try:
+            googleSTT = r.recognize_google(audio)
+            print(googleSTT)
+        except sr.UnknownValueError:
+            print("Google Speech Recognition could not understand audio")
+        except sr.RequestError as e:
+            print("Could not request results from Google Speech Recognition service; {0}".format(e))
+        return googleSTT
 
     def close(self):
         self.socket.close()
 
-    def send(self):
-        message = self._build_message('caption')
+    def send(self, message):
         self.socket.send(message)
         response = self.socket.recv(4096)
         response = json.loads(response)
@@ -61,7 +83,8 @@ class Client:
                     # "image": self.cam.take_image(),
                 }).encode()
         return json.dumps({
-            "type": "visual-question-answering",
+            # "type": "visual-question-answering",
+            "type": type,
             "image": "",
             # "image": self.cam.take_image(),
             "question": question,
@@ -70,4 +93,7 @@ class Client:
 
 if __name__ == '__main__':
     api = Client()
-    api.start()
+    try:
+        api.start()
+    finally:
+        api.close()

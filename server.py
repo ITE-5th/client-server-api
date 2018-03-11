@@ -4,7 +4,6 @@ import socket
 # from image_to_text.image_to_text import ImageToText
 # from vqa.vqa import Vqa
 import threading
-from random import randint
 
 
 class Server:
@@ -28,7 +27,8 @@ class Server:
             type = message["type"].lower()
             # image = message["image"]
             # image = base64.decodebytes(image)
-            result = {"result": 'test{}'.format(randint(0, 9))}
+            # result = {"result": 'test{}'.format(randint(0, 9))}
+            result = {"result": message["question"]}
             if type == "visual-question-answering":
                 question = message["question"]
                 result["result"] = self.vqa.predict(question, image)
