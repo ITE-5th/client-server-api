@@ -1,10 +1,8 @@
 import json
 import socket
 
-from TTS import TTS
-
-
 # from client.camera import Camera
+from client.TTS import TTS
 
 
 class Client:
@@ -15,16 +13,22 @@ class Client:
         self.tts = TTS(festival=False, espeak=False, pico=True)
         # self.recognizer = Recognizer(server=self)
 
-        # create an ipv4 (AF_INET) socket object using the tcp protocol (SOCK_STREAM)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        # connect the client
-        # client.connect((target, port))
 
     def start(self):
         print('connected to server ' + self.host + ':' + str(self.port))
 
         self.socket.connect((self.host, self.port))
+        self.send()
+        self.send()
+        self.send()
+        self.send()
+        self.send()
+        self.send()
+        self.send()
+        self.send()
+        self.send()
         self.send()
         self.send()
         self.send()
