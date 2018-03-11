@@ -12,7 +12,7 @@ class Client:
         self.host = host
         self.port = port
         # self.cam = Camera()
-        self.tts = TTS()
+        self.tts = TTS(festival=False, espeak=False, pico=True)
         # self.recognizer = Recognizer(server=self)
 
         # create an ipv4 (AF_INET) socket object using the tcp protocol (SOCK_STREAM)
@@ -26,20 +26,23 @@ class Client:
 
         self.socket.connect((self.host, self.port))
         self.send()
+        self.send()
+        self.send()
+        self.send()
         self.close()
-        # #     start recogniser
+        #     start recogniser
         # self.recognizer.start()
 
     def close(self):
         self.socket.close()
 
     def send(self):
-        self.socket.send(self._build_message('caption'))
+        message = self._build_message('caption')
+        self.socket.send(message)
         response = self.socket.recv(4096)
         response = json.loads(response)
 
         self.tts.say(response['result'])
-        self.close()
 
     def _build_message(self, type, question=None):
         # type == "visual-question-answering"
