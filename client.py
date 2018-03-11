@@ -7,16 +7,18 @@ import speech_recognition as sr
 # from client.camera import Camera
 from client.TTS import TTS
 from client.recognizer import Recognizer
+from client.speaker import Speaker
+from client.speaker import SpeakersModel
 
 
 class Client:
-    def __init__(self, host=socket.gethostname(), port=1234):
+    def __init__(self, speaker_name, host=socket.gethostname(), port=1234):
         self.host = host
         self.port = port
+        self.speaker_name = speaker_name
         # self.cam = Camera()
         self.tts = TTS(festival=False, espeak=False, pico=True)
         self.recognizer = Recognizer(server=self)
-
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -29,16 +31,23 @@ class Client:
 
     def audio_recorder_callback(self, fname):
         # verify speaker
-
-        print("converting audio to text")
-        speech = self.speechToText(fname)
-        print(speech)
-        message = self._build_message('vqa', question=speech)
-
-        self.send(message)
+        threshold = 0.5
+        if self.get_speaker(fname) > threshold:
+            print("converting audio to text")
+            speech = self.speech_to_text(fname)
+            message = self._build_message('vqa', question=speech)
+            self.send(message)
+        else:
+            print('speaker is not verified')
         os.remove(fname)
 
-    def speechToText(self, fname):
+    def get_speaker(self, fname):
+        # Speaker() used for import speaker class only
+        Speaker(name='test')
+        model: SpeakersModel = SpeakersModel.load("models/gmms.model")
+        return model.verify_speaker(fname, self.speaker_name.title())
+
+    def speech_to_text(self, fname):
         r = sr.Recognizer()
         with sr.AudioFile(fname) as source:
             audio = r.record(source)  # read the entire audio file
@@ -51,6 +60,7 @@ class Client:
 
         except sr.RequestError as e:
             print("Sphinx error; {0}".format(e))
+        googleSTT = ''
         try:
             googleSTT = r.recognize_google(audio)
             print(googleSTT)
@@ -67,7 +77,6 @@ class Client:
         self.socket.send(message)
         response = self.socket.recv(4096)
         response = json.loads(response)
-
         self.tts.say(response['result'])
 
     def _build_message(self, type, question=None):
@@ -92,7 +101,7 @@ class Client:
 
 
 if __name__ == '__main__':
-    api = Client()
+    api = Client(speaker_name='zaher')
     try:
         api.start()
     finally:

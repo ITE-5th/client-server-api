@@ -102,3 +102,5 @@ ENV/
 .idea/mclient-server-api.iml
 /client/voice.wav
 .idea/
+models/
+/client/data/

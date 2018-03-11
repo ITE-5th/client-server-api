@@ -4,7 +4,7 @@ import socket
 # from image_to_text.image_to_text import ImageToText
 # from vqa.vqa import Vqa
 import threading
-
+import os
 
 class Server:
     def __init__(self, host=socket.gethostname(), port=1234):
@@ -57,7 +57,7 @@ class Server:
 
 if __name__ == '__main__':
     # when server Address already in use
-    # os.system('ps -fA | grep python | tail -n1 | awk \'{ print $3 }\'|xargs kill')
+    os.system('ps -fA | grep python | tail -n1 | awk \'{ print $3 }\'|xargs kill')
     server = Server()
 
     try:
