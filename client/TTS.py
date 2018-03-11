@@ -19,6 +19,7 @@ class TTS:
         if self.Pico:
             print('Pico Text to Speech')
             os.system('pico2wave -w voice.wav "' + message + '" && aplay voice.wav')
+            os.remove('voice.wav')
 
 
 if __name__ == '__main__':
