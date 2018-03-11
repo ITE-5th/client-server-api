@@ -18,7 +18,6 @@ class Server:
         # self.vqa = Vqa()
         # self.face_recognition = FaceRecognition()
         # self.image_to_text = ImageToText()
-
         self.client_socket, self.address = None, None
 
     def handle_client_connection(self, client_socket):
@@ -57,7 +56,10 @@ class Server:
 
 
 if __name__ == '__main__':
+    # when server Address already in use
+    # os.system('ps -fA | grep python | tail -n1 | awk \'{ print $3 }\'|xargs kill')
     server = Server()
+
     try:
         server.start()
     except:
