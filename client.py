@@ -4,9 +4,9 @@ import speech_recognition as sr
 
 from client.TTS import TTS
 from client.camera import Camera
-# from client.recognizer import Recognizer
-# from client.speaker import Speaker
-# from client.speaker import SpeakersModel
+from client.recognizer import Recognizer
+from client.speaker import Speaker
+from client.speaker import SpeakersModel
 from helper import Helper
 
 
@@ -17,7 +17,7 @@ class ClientAPI:
         self.speaker_name = speaker_name
         self.cam = Camera()
         self.tts = TTS(festival=False, espeak=False, pico=True)
-        # self.recognizer = Recognizer(server=self)
+        self.recognizer = Recognizer(server=self)
         # response now is {'data': {'some_list': [123, 456]}}
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -27,16 +27,15 @@ class ClientAPI:
 
         self.socket.connect((self.host, self.port))
         #     start recogniser
-        # self.recognizer.start(self.audio_recorder_callback)
-        self.audio_recorder_callback('')
+        self.recognizer.start(self.audio_recorder_callback)
+        # self.audio_recorder_callback('')
 
     def audio_recorder_callback(self, fname):
         # verify speaker
         threshold = 0.5
         # if self.get_speaker(fname) > threshold:
-        #     print("converting audio to text")
-        #     speech = self.speech_to_text(fname)
-        speech = 'test message'
+        print("converting audio to text")
+        speech = self.speech_to_text(fname)
         message = self._build_message('vqa', question=speech)
         self.communicate_with_server(message)
         # else:
@@ -55,8 +54,8 @@ class ClientAPI:
             audio = r.record(source)  # read the entire audio file
         # recognize speech using Google Speech Recognition
         try:
-            print("Sphinx thinks you said " + r.recognize_sphinx(audio))
-
+            #print("Sphinx thinks you said " + r.recognize_sphinx(audio))
+            print("")
         except sr.UnknownValueError:
             print("Sphinx could not understand audio")
 
@@ -79,8 +78,7 @@ class ClientAPI:
         Helper.send_json(self.socket, message)
         response = Helper.receive_json(self.socket)
         print(response)
-
-        # self.tts.say(response['result'])
+        self.tts.say(response['result'])
 
     def _build_message(self, type, question=None):
         # type == "visual-question-answering"

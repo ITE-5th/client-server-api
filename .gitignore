@@ -104,3 +104,6 @@ ENV/
 .idea/
 models/
 /client/data/
+imageToSave.jpg
+images.jpg
+test.jpg
