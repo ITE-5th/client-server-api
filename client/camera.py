@@ -18,5 +18,5 @@ class Camera:
 
 
 if __name__ == '__main__':
-    c = Camera(width=400, height=400)
+    c = Camera(width=50, height=50)
     print(c.take_image())

@@ -102,7 +102,7 @@ class HotwordDetector(object):
             self.detector.SetSensitivity(sensitivity_str.encode())
 
         self.ring_buffer = RingBuffer(
-            self.detector.NumChannels() * self.detector.SampleRate() * 5)
+            self.detector.NumChannels() * 16000 * 5)
 
     def start(self, detected_callback=play_audio_file,
               interrupt_check=lambda: False,

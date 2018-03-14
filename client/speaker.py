@@ -1,8 +1,9 @@
 import glob
 import math
+import os
 import pickle
 import random
-import os
+
 import numpy as np
 import scipy.io.wavfile as wav
 from python_speech_features import mfcc

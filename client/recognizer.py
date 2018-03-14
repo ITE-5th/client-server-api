@@ -8,7 +8,7 @@ interrupted = False
 class Recognizer:
     def __init__(self, pmdl_path=None, sensitivity=0.38, sphinx=True, google=True, server=None):
         if pmdl_path is None:
-            pmdl_path = ['./resources/models/snowboy.umdl']
+            pmdl_path = ['./client/resources/models/snowboy.umdl']
 
         model = pmdl_path
         # capture SIGINT signal, e.g., Ctrl+C
@@ -30,7 +30,7 @@ class Recognizer:
 
     def detectedCallback(self):
         snowboydecoder.play_audio_file(snowboydecoder.DETECT_DING)
-        print('recording audio...', end='', flush=True)
+        print('recording audio...')
 
     def signal_handler(self, signal, frame):
         global interrupted

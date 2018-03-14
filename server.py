@@ -1,10 +1,12 @@
-import json
+import base64
 import os
 import socket
 # from face_recognition.face_recognition import FaceRecognition
 # from image_to_text.image_to_text import ImageToText
 # from vqa.vqa import Vqa
 import threading
+
+from helper import Helper
 
 
 class Server:
@@ -22,23 +24,34 @@ class Server:
 
     def handle_client_connection(self, client_socket):
         while True:
-            message = client_socket.recv(100000)
-            message = json.loads(message)
-            print(message)
-            type = message["type"].lower()
-            # image = message["image"]
-            # image = base64.decodebytes(image)
-            # result = {"result": 'test{}'.format(randint(0, 9))}
-            result = {"result": message["question"]}
-            if type == "visual-question-answering":
-                question = message["question"]
-                result["result"] = self.vqa.predict(question, image)
-            elif type == "face-recognition":
-                result["result"] = self.face_recognition.predict(image)
-            elif type == "image-to-text":
-                result["result"] = self.image_to_text.predict(image)
-            result = json.dumps(result)
-            client_socket.send(result.encode())
+            message = Helper.receive_json(client_socket)
+            # message = client_socket.recv(100000)
+            # message = json.loads(message)
+            # print("message\n")
+            # print(message)
+            if message != '':
+                img_data, question, type = self.get_data(message)
+                with open("imageToSave.jpg", "wb") as fh:
+                    fh.write(base64.decodebytes(img_data.encode('utf-8')))
+                result = {"result": question}
+                if type == "visual-question-answering":
+                    result["result"] = self.vqa.predict(question, image)
+                elif type == "face-recognition":
+                    result["result"] = self.face_recognition.predict(image)
+                elif type == "image-to-text":
+                    result["result"] = self.image_to_text.predict(image)
+                Helper.send_json(client_socket, result)
+
+    def get_data(self, message):
+        type = ''
+        img_data = ''
+        question = ''
+        try:
+            type = message['type'].lower()
+            img_data = message["image"]
+            question = message["question"]
+        finally:
+            return img_data, question, type
 
     def start(self):
         print('server started at {}:{}'.format(self.host, str(self.port)))
