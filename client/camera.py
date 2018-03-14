@@ -13,7 +13,7 @@ class Camera:
         file_name = 'Image.jpg'
         self.camera.capture(file_name)
         with open(file_name, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read())
+            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
         return encoded_string
 
 

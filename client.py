@@ -1,11 +1,9 @@
-import base64
 import socket
-# from client.camera import Camera
-import time
 
 import speech_recognition as sr
 
 from client.TTS import TTS
+from client.camera import Camera
 # from client.recognizer import Recognizer
 # from client.speaker import Speaker
 # from client.speaker import SpeakersModel
@@ -17,7 +15,7 @@ class ClientAPI:
         self.host = host
         self.port = port
         self.speaker_name = speaker_name
-        # self.cam = Camera()
+        self.cam = Camera()
         self.tts = TTS(festival=False, espeak=False, pico=True)
         # self.recognizer = Recognizer(server=self)
         # response now is {'data': {'some_list': [123, 456]}}
@@ -34,16 +32,13 @@ class ClientAPI:
 
     def audio_recorder_callback(self, fname):
         # verify speaker
-        threshold = 0.1
+        threshold = 0.5
         # if self.get_speaker(fname) > threshold:
         #     print("converting audio to text")
         #     speech = self.speech_to_text(fname)
-        while threshold > 0:
-            speech = 'test message'
-            message = self._build_message('vqa', question=speech)
-            self.communicate_with_server(message)
-            threshold -= 0.1
-            time.sleep(1)
+        speech = 'test message'
+        message = self._build_message('vqa', question=speech)
+        self.communicate_with_server(message)
         # else:
         #     print('speaker is not verified')
         # os.remove(fname)
@@ -91,8 +86,9 @@ class ClientAPI:
         # type == "visual-question-answering"
         # type == "face-recognition"
         # type == "image-to-text"
-        with open("test.jpg", "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+        #with open("test.jpg", "rb") as image_file:
+        #    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+        encoded_string = self.cam.take_image()
         json_data = {
             "type": type,
             "image": encoded_string,
