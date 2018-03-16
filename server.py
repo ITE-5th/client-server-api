@@ -1,4 +1,3 @@
-import base64
 import os
 import socket
 # from face_recognition.face_recognition import FaceRecognition
@@ -6,11 +5,13 @@ import socket
 # from vqa.vqa import Vqa
 import threading
 
+import cv2
+
 from helper import Helper
 
 
 class Server:
-    def __init__(self, host=socket.gethostname(), port=1234):
+    def __init__(self, host=socket.gethostname(), port=1235):
         self.host = host
         self.port = port
         # self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -31,8 +32,12 @@ class Server:
             # print(message)
             if message != '':
                 img_data, question, type = self.get_data(message)
-                with open("imageToSave.jpg", "wb") as fh:
-                    fh.write(base64.decodebytes(img_data.encode('utf-8')))
+                # nparr = np.fromstring(base64.decodebytes(img_data.encode()), np.uint8)
+                # img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                img = cv2.imread('D:\Projects\PycharmProjects\mclient-server-api\images.jpg')
+                cv2.imshow('Image', img)
+                # with open("imageToSave.jpg", "wb") as fh:
+                #     fh.write(base64.decodebytes(img_data.encode('utf-8')))
                 result = {"result": question}
                 if type == "visual-question-answering":
                     result["result"] = self.vqa.predict(question, image)
@@ -72,7 +77,7 @@ class Server:
 if __name__ == '__main__':
     # when server Address already in use
     os.system('ps -fA | grep python | tail -n1 | awk \'{ print $3 }\'|xargs kill')
-    server = Server()
+    server = Server(host='192.168.1.3')
 
     try:
         server.start()
