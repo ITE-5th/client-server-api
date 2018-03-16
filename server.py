@@ -80,7 +80,7 @@ class Server:
 if __name__ == '__main__':
     # when server Address already in use
     os.system('ps -fA | grep python | tail -n1 | awk \'{ print $3 }\'|xargs kill')
-    server = Server(host='localhost')
+    server = Server(host='192.168.1.3')
 
     try:
         server.start()
