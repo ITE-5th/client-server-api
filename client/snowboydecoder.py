@@ -200,7 +200,6 @@ class HotwordDetector(object):
                         callback()
 
                     if acallback is not None:
-                        print(status)
                         state = "ACTIVE"
                     continue
 
@@ -218,7 +217,6 @@ class HotwordDetector(object):
 
                 if stopRecording == True:
                     fname = self.saveMessage()
-                    print(status)
                     acallback(fname)
                     state = "PASSIVE"
                     continue
