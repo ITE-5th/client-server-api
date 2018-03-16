@@ -8,7 +8,12 @@ interrupted = False
 class Recognizer:
     def __init__(self, pmdl_path=None, sensitivity=0.38, sphinx=True, google=True, server=None):
         if pmdl_path is None:
-            pmdl_path = ['./client/resources/models/snowboy.umdl']
+            pmdl_path = [
+                '../client/resources/models/snowboy.umdl',
+                '../client/resources/models/alexa.umdl',
+                '../client/resources/models/smart_mirror.umdl',
+                '../client/resources/models/alexa_02092017.umdl'
+            ]
 
         model = pmdl_path
         # capture SIGINT signal, e.g., Ctrl+C
@@ -21,16 +26,28 @@ class Recognizer:
     def start(self, callback_function):
         # main loop
         print('Listening... Press Ctrl+C to exit')
-        self.detector.start(detected_callback=self.detectedCallback,
-                            audio_recorder_callback=callback_function,
+        callbacks = [lambda: [snowboydecoder.play_audio_file(snowboydecoder.DETECT_DING)],
+                     lambda: [
+                         snowboydecoder.play_audio_file(snowboydecoder.DETECT_DONG),
+                         callback_function(hotword_id='caption')
+                     ],
+                     lambda: [
+                         snowboydecoder.play_audio_file(snowboydecoder.DETECT_DONG),
+                         callback_function(hotword_id='ocr')
+                     ],
+                     lambda: [
+                         snowboydecoder.play_audio_file(snowboydecoder.DETECT_DONG),
+                         callback_function(hotword_id='face')
+                     ]]
+
+        acallbacks = [lambda fname: callback_function(fname, hotword_id='vqa'), None, None, None]
+
+        self.detector.start(detected_callback=callbacks,
+                            audio_recorder_callback=acallbacks,
                             interrupt_check=self.interrupt_callback,
                             sleep_time=0.01)
 
         self.detector.terminate()
-
-    def detectedCallback(self):
-        snowboydecoder.play_audio_file(snowboydecoder.DETECT_DING)
-        print('recording audio...')
 
     def signal_handler(self, signal, frame):
         global interrupted

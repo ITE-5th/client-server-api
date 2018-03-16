@@ -170,6 +170,7 @@ class HotwordDetector(object):
         logger.debug("detecting...")
 
         state = "PASSIVE"
+        acallback = None
         while self._running is True:
             if interrupt_check():
                 logger.debug("detect voice break")
@@ -178,7 +179,6 @@ class HotwordDetector(object):
             if len(data) == 0:
                 time.sleep(sleep_time)
                 continue
-
             status = self.detector.RunDetection(data)
             if status == -1:
                 logger.warning("Error initializing streams or reading audio data")
@@ -195,10 +195,12 @@ class HotwordDetector(object):
                                              time.localtime(time.time()))
                     logger.info(message)
                     callback = detected_callback[status - 1]
+                    acallback = audio_recorder_callback[status - 1]
                     if callback is not None:
                         callback()
 
-                    if audio_recorder_callback is not None:
+                    if acallback is not None:
+                        print(status)
                         state = "ACTIVE"
                     continue
 
@@ -216,7 +218,8 @@ class HotwordDetector(object):
 
                 if stopRecording == True:
                     fname = self.saveMessage()
-                    audio_recorder_callback(fname)
+                    print(status)
+                    acallback(fname)
                     state = "PASSIVE"
                     continue
 

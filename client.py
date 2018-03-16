@@ -4,10 +4,10 @@ import speech_recognition as sr
 
 from client.TTS import TTS
 from client.camera import Camera
-# from client.recognizer import Recognizer
-# from client.speaker import Speaker
-# from client.speaker import SpeakersModel
-from client.ocr import OCR
+from client.recognizer import Recognizer
+from client.speaker import Speaker
+from client.speaker import SpeakersModel
+# from client.ocr import OCR
 from helper import Helper
 
 
@@ -18,32 +18,33 @@ class ClientAPI:
         self.speaker_name = speaker_name
         self.cam = Camera()
         self.tts = TTS(festival=False, espeak=False, pico=True)
-        # self.recognizer = Recognizer(server=self)
-        # response now is {'data': {'some_list': [123, 456]}}
+        self.recognizer = Recognizer(server=self)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def start(self):
 
         self.socket.connect((self.host, self.port))
         print('connected to server ' + self.host + ':' + str(self.port))
-
         #     start recogniser
-        # self.recognizer.start(self.audio_recorder_callback)
-        self.audio_recorder_callback('')
+        self.recognizer.start(self.audio_recorder_callback)
 
-    def audio_recorder_callback(self, fname):
-        # verify speaker
-        threshold = 0.5
-        # if self.get_speaker(fname) > threshold:
-        print("converting audio to text")
-        # speech = self.speech_to_text(fname)
-        speech = 'hello'
-        # message = self._build_message('vqa', question=speech)
-        message = self._build_message('OCR')
-        self.communicate_with_server(message)
-        # else:
-        #     print('speaker is not verified')
-        # os.remove(fname)
+    def audio_recorder_callback(self, fname=None, hotword_id=None):
+        message = None
+        if hotword_id == 'vqa':
+            # verify speaker
+            threshold = 0.5
+            if self.get_speaker(fname) > threshold:
+                print("converting audio to text")
+                speech = self.speech_to_text(fname)
+                message = self._build_message(hotword_id, question=speech)
+                # os.remove(fname)
+            else:
+                print('speaker is not verified')
+        else:
+            message = self._build_message(hotword_id)
+
+        if message is not None:
+            self.communicate_with_server(message)
 
     def get_speaker(self, fname):
         # Speaker() used for import speaker class only
@@ -90,8 +91,6 @@ class ClientAPI:
         # type == "visual-question-answering"
         # type == "face-recognition"
         # type == "image-to-text"
-        # with open("images.jpg", "rb") as image_file:
-        #    encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
         image_file = self.cam.take_image()
         json_data = {
             "type": type,
@@ -105,7 +104,7 @@ class ClientAPI:
 
 
 if __name__ == '__main__':
-    api = ClientAPI(speaker_name='zaher', host='192.168.1.3')
+    api = ClientAPI(speaker_name='zaher', host='localhost')
     try:
         api.start()
     finally:

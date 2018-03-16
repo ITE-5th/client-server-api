@@ -5,8 +5,6 @@ import socket
 # from vqa.vqa import Vqa
 import threading
 
-import cv2
-
 from helper import Helper
 
 
@@ -24,28 +22,33 @@ class Server:
         self.client_socket, self.address = None, None
 
     def handle_client_connection(self, client_socket):
-        while True:
-            message = Helper.receive_json(client_socket)
-            # message = client_socket.recv(100000)
-            # message = json.loads(message)
-            # print("message\n")
-            # print(message)
-            if message != '':
-                img_data, question, type = self.get_data(message)
-                # nparr = np.fromstring(base64.decodebytes(img_data.encode()), np.uint8)
-                # img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-                img = cv2.imread('D:\Projects\PycharmProjects\mclient-server-api\images.jpg')
-                cv2.imshow('Image', img)
-                # with open("imageToSave.jpg", "wb") as fh:
-                #     fh.write(base64.decodebytes(img_data.encode('utf-8')))
-                result = {"result": question}
-                if type == "visual-question-answering":
-                    result["result"] = self.vqa.predict(question, image)
-                elif type == "face-recognition":
-                    result["result"] = self.face_recognition.predict(image)
-                elif type == "image-to-text":
-                    result["result"] = self.image_to_text.predict(image)
-                Helper.send_json(client_socket, result)
+        try:
+            while True:
+                message = Helper.receive_json(client_socket)
+                # message = client_socket.recv(100000)
+                # message = json.loads(message)
+                # print("message\n")
+                # print(message)
+                if message != '':
+                    img_data, question, type = self.get_data(message)
+                    # nparr = np.fromstring(base64.decodebytes(img_data.encode()), np.uint8)
+                    # img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+                    # img = cv2.imread('D:\Projects\PycharmProjects\mclient-server-api\images.jpg')
+                    # cv2.imshow('Image', img)
+                    # with open("imageToSave.jpg", "wb") as fh:
+                    #     fh.write(base64.decodebytes(img_data.encode('utf-8')))
+                    result = {"result": question}
+                    if type == "visual-question-answering":
+                        result["result"] = self.vqa.predict(question, image)
+                    elif type == "face-recognition":
+                        result["result"] = self.face_recognition.predict(image)
+                    elif type == "image-to-text":
+                        result["result"] = self.image_to_text.predict(image)
+                    Helper.send_json(client_socket, result)
+        except:
+            print('Client Disconnected stopped')
+        finally:
+            client_socket.close()
 
     def get_data(self, message):
         type = ''
@@ -77,7 +80,7 @@ class Server:
 if __name__ == '__main__':
     # when server Address already in use
     os.system('ps -fA | grep python | tail -n1 | awk \'{ print $3 }\'|xargs kill')
-    server = Server(host='192.168.1.3')
+    server = Server(host='localhost')
 
     try:
         server.start()
